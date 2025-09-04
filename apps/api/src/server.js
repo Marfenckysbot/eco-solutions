@@ -11,6 +11,7 @@ import aiRouter from "./routes/ai.js";
 import authRouter from "./routes/auth.js";
 
 dotenv.config();
+
 const app = express();
 const logger = pino({ level: process.env.LOG_LEVEL || "info" });
 app.use(pinoHttp({ logger }));
@@ -19,34 +20,47 @@ const FRONTEND = process.env.FRONTEND_URL || "http://localhost:3000";
 app.use(cors({ origin: FRONTEND }));
 app.use(express.json({ limit: "1mb" }));
 
-// Redis
-const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-const redis = new Redis(REDIS_URL);
-redis.on("connect", () => logger.info("Redis connected"));
-redis.on("error", (e) => logger.error({ err: e }, "Redis error"));
+// --- MongoDB Connection ---
+let mongoConnected = false;
+mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/eco_petcare")
+  .then(() => {
+    logger.info("✅ Connected to MongoDB");
+    mongoConnected = true;
+  })
+  .catch(err => {
+    logger.error({ err }, "❌ MongoDB connection error");
+    mongoConnected = false;
+  });
+
+// --- Redis Connection ---
+let redisConnected = false;
+const redis = new Redis(process.env.REDIS_URL || "redis://127.0.0.1:6379");
+redis.on("connect", () => {
+  logger.info("✅ Connected to Redis");
+  redisConnected = true;
+});
+redis.on("error", (err) => {
+  logger.error({ err }, "❌ Redis error");
+  redisConnected = false;
+});
 app.locals.redis = redis;
 
-// Health
-app.get("/", (_, res) => res.json({ ok: true, service: "eco-api" }));
+// --- Health Endpoint ---
+app.get("/", (req, res) => {
+  res.json({
+    ok: true,
+    service: "eco-api",
+    mongoConnected,
+    redisConnected
+  });
+});
 
-// Routes
+// --- Routes ---
 app.use("/api/auth", authRouter);
 app.use("/api/payments", paymentsRouter);
 app.use("/api/pets", petsRouter);
 app.use("/api/ai", aiRouter);
 
-// DB + Server
+// --- Start Server ---
 const PORT = process.env.PORT || 5000;
-const MONGO = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/eco_petcare";
-
-async function start() {
-  try {
-    await mongoose.connect(MONGO);
-    logger.info("MongoDB connected");
-    app.listen(PORT, () => logger.info(`API listening on :${PORT}`));
-  } catch (err) {
-    logger.error({ err }, "Startup error");
-    process.exit(1);
-  }
-}
-start();
+app.listen(PORT, () => logger.info(`🚀 API listening on :${PORT}`));
