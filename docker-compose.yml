@@ -1,0 +1,22 @@
+﻿version: "3.8"
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+      - api
+      - admin
+  web:
+    build: ./apps/web
+  api:
+    build: ./apps/api
+  admin:
+    build: ./apps/admin-dashboard
+  mongo:
+    image: mongo:6
+  redis:
+    image: redis:7
