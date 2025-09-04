@@ -1,4 +1,4 @@
-﻿name: Deploy Eco Solutions
+name: Deploy Eco Solutions
 
 on:
   push:
@@ -6,22 +6,14 @@ on:
       - main
 
 jobs:
-  deploy-web:
-    name: Deploy Web to Vercel
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Vercel Deploy Hook
-        run: |
-          curl -X POST "$VERCEL_DEPLOY_HOOK"
+      - name: Trigger Vercel Deploy
+        run: curl -X POST "$VERCEL_DEPLOY_HOOK"
         env:
           VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
-
-  deploy-api:
-    name: Deploy API to Render
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Render Deploy Hook
-        run: |
-          curl -X POST "$RENDER_DEPLOY_HOOK"
+      - name: Trigger Render Deploy
+        run: curl -X POST "$RENDER_DEPLOY_HOOK"
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}

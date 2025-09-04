@@ -1,3 +1,3 @@
-export function formatDollarcent(dollar) {
-  return Math.round(Number(dollar) * 100);
+export function formatNairaKobo(naira) {
+  return "₦" + Number(naira).toLocaleString("en-NG", { minimumFractionDigits: 2 });
 }

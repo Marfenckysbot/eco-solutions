@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -42,72 +42,11 @@ const MONGO = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/eco_petcare";
 async function start() {
   try {
     await mongoose.connect(MONGO);
-    logger.info("Mongo connected");
+    logger.info("MongoDB connected");
+    app.listen(PORT, () => logger.info(`API listening on :${PORT}`));
   } catch (err) {
-    logger.error({ err }, "Mongo connection failed");
-    console.warn("Continuing without DB. /api/pets & /api/auth need DB.");
+    logger.error({ err }, "Startup error");
+    process.exit(1);
   }
-  app.listen(PORT, () => logger.info(`API listening on ${PORT}`));
 }
 start();
-
-// --- Helper to check if a value is a placeholder ---
-// Duplicate isPlaceholder function removed to avoid redeclaration error.
-// --- MongoDB connection ---
-if (!isPlaceholder(process.env.MONGO_URI)) {
-  import("mongoose").then(mongoose => {
-    mongoose.connect(process.env.MONGO_URI)
-      .then(() => console.log("✅ Connected to MongoDB"))
-      .catch(err => console.error("❌ MongoDB connection error:", err));
-  });
-} else {
-  console.log("⚠️ Skipping MongoDB connection — placeholder MONGO_URI detected");
-}
-
-// --- Example: Paystack ---
-if (!isPlaceholder(process.env.PAYSTACK_SECRET_KEY)) {
-  console.log("✅ Paystack key detected — ready to process payments");
-} else {
-  console.log("⚠️ Skipping Paystack integration — placeholder key detected");
-}
-
-// --- Example: OpenAI ---
-if (!isPlaceholder(process.env.OPENAI_API_KEY)) {
-  console.log("✅ OpenAI key detected — AI features enabled");
-} else {
-  console.log("⚠️ Skipping OpenAI integration — placeholder key detected");
-}
-
-// --- Basic route ---
-app.get("/", (req, res) => {
-  res.json({ ok: true, service: "eco-api", mongo: !isPlaceholder(process.env.MONGO_URI) });
-});
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-const isPlaceholder = (val) => {
-  if (!val) return true;
-  const lower = val.toLowerCase();
-  return lower.includes("placeholder") || lower === "mongodb://placeholder" || lower.startsWith("sk-placeholder");
-};
-
-// MongoDB
-if (!isPlaceholder(process.env.MONGO_URI)) {
-  // connect to Mongo
-} else {
-  console.log("⚠️ Skipping MongoDB connection — placeholder MONGO_URI detected");
-}
-
-// Paystack
-if (!isPlaceholder(process.env.PAYSTACK_SECRET_KEY)) {
-  console.log("✅ Paystack key detected");
-} else {
-  console.log("⚠️ Skipping Paystack integration — placeholder key detected");
-}
-
-// OpenAI
-if (!isPlaceholder(process.env.OPENAI_API_KEY)) {
-  console.log("✅ OpenAI key detected");
-} else {
-  console.log("⚠️ Skipping OpenAI integration — placeholder key detected");
-}

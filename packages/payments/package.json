@@ -1,6 +1,5 @@
-﻿{
-  "name": "@eco/payments",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "index.js"
+{
+  "name": "payments",
+  "main": "index.js",
+  "private": true
 }
