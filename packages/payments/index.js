@@ -1,3 +1,3 @@
-﻿export function formatNairaKobo(naira) {
-  return Math.round(Number(naira) * 100);
+export function formatDollarcent(dollar) {
+  return Math.round(Number(dollar) * 100);
 }
