@@ -10,7 +10,8 @@
     "dev:api": "npm run dev --workspace apps/api",
     "dev:admin": "npm run dev --workspace apps/admin-dashboard",
     "start:api": "npm run start --workspace apps/api",
-    "build:admin": "npm run build --workspace apps/admin-dashboard"
+    "build:admin": "npm run build --workspace apps/admin-dashboard",
+    "check:api": "node --check apps/api/src/server.js && node --check apps/api/src/routes/auth.js && node --check apps/api/src/routes/payments.js && node --check apps/api/src/routes/pets.js && node --check apps/api/src/routes/ai.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
