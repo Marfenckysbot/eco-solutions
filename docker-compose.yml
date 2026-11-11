@@ -1,21 +1,42 @@
-version: "3.8"
 services:
   api:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     ports:
       - "5000:5000"
-    env_file:
-      - ./apps/api/.env.local
-    command: npm start
-  web:
-    build: ./apps/web
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./apps/web/.env.local
-    command: npm start
+    environment:
+      PORT: "5000"
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5174}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017/eco_petcare}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
   admin-dashboard:
-    build: ./apps/admin-dashboard
+    build:
+      context: .
+      dockerfile: apps/admin-dashboard/Dockerfile
     ports:
-      - "5174:5174"
-    command: npm start
+      - "5174:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
