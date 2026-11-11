@@ -1,22 +1,15 @@
 import { Router } from "express";
-import axios from "axios";
-const r = Router();
-const OPENAI_KEY = process.env.OPENAI_API_KEY || "";
-r.post("/", async (req, res) => {
-  try {
-    const { prompt } = req.body;
-    const { data } = await axios.post(
-      "https://api.openai.com/v1/completions",
-      {
-        model: "text-davinci-003",
-        prompt,
-        max_tokens: 100
-      },
-      { headers: { Authorization: `Bearer ${OPENAI_KEY}` } }
-    );
-    res.json(data);
-  } catch (e) {
-    res.status(400).json({ error: e.message });
-  }
+
+const router = Router();
+
+// Do not expose an unauthenticated, unmetered legacy model endpoint.
+// Enable AI only after provider selection, request validation, authentication,
+// rate limiting and spending controls are implemented.
+router.all("*", (_req, res) => {
+  res.status(503).json({
+    error: "AI assistance is not configured",
+    code: "AI_NOT_CONFIGURED"
+  });
 });
-export default r;
+
+export default router;
