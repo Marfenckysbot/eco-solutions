@@ -24,3 +24,5 @@ jobs:
         run: npm run check:api
       - name: Build admin dashboard
         run: npm run build:admin
+      - name: Build Docker images from the Compose configuration
+        run: docker compose -f docker-compose.dev.yml build
