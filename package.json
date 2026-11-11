@@ -6,7 +6,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm:start --workspace apps/api\" \"npm:start --workspace apps/web\" \"npm:start --workspace apps/admin-dashboard\""
+    "dev": "concurrently \"npm run dev --workspace apps/api\" \"npm run dev --workspace apps/admin-dashboard\"",
+    "dev:api": "npm run dev --workspace apps/api",
+    "dev:admin": "npm run dev --workspace apps/admin-dashboard",
+    "start:api": "npm run start --workspace apps/api",
+    "build:admin": "npm run build --workspace apps/admin-dashboard"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
